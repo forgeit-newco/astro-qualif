@@ -1,0 +1,39 @@
+# AWS Configuration
+aws_region   = "eu-west-1"
+environment  = "production"
+project_name = "astro-qualif"
+
+# Custom Domain (optional)
+# Uncomment and configure if you have a custom domain
+# domain_name     = "qualif.example.com"
+# route53_zone_id = "Z1234567890ABC"
+
+# reCAPTCHA Configuration
+# Get your keys from: https://www.google.com/recaptcha/admin
+recaptcha_site_key   = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"  # Test key
+recaptcha_secret_key = "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"  # Test key
+
+# Admin User Credentials
+admin_email    = "admin@example.com"
+admin_password = "forge2024"  # CHANGE IN PRODUCTION
+
+# JWT Secret (leave empty to auto-generate)
+jwt_secret = ""
+
+# Lambda Configuration
+lambda_runtime     = "nodejs20.x"
+lambda_memory_size = 256
+lambda_timeout     = 10
+
+# API Gateway Throttling
+api_throttle_rate_limit  = 100  # requests per second
+api_throttle_burst_limit = 50
+
+# CloudWatch Logs Retention
+cloudwatch_log_retention_days = 7  # 7 days for POC, 30+ for production
+
+# WAF (optional, adds ~5$/month)
+enable_waf = false
+
+# CORS Configuration
+cors_allowed_origins = ["*"]  # Restrict in production

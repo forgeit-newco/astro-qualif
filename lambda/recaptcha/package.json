@@ -1,0 +1,13 @@
+{
+  "name": "astro-qualif-recaptcha-lambda",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "zip -r ../recaptcha.zip . -x '*.zip' -x 'node_modules/.cache/*'"
+  },
+  "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.540.0"
+  },
+  "packageManager": "yarn@4.12.0"
+}

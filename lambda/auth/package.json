@@ -1,0 +1,17 @@
+{
+  "name": "astro-qualif-auth-lambda",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "zip -r ../auth.zip . -x '*.zip' -x 'node_modules/.cache/*'"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.540.0",
+    "@aws-sdk/client-secrets-manager": "^3.540.0",
+    "@aws-sdk/lib-dynamodb": "^3.540.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "packageManager": "yarn@4.12.0"
+}

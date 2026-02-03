@@ -1,0 +1,121 @@
+{
+  "prospects": [
+    {
+      "id": "1",
+      "identity": {
+        "firstName": "Jean",
+        "lastName": "Dupont",
+        "email": "jean.dupont@techcorp.com",
+        "phone": "0612345678",
+        "company": "TechCorp",
+        "position": "CTO"
+      },
+      "techEcosystem": {
+        "teamSize": "40-100",
+        "forges": [
+          "GitHub",
+          "GitLab"
+        ],
+        "clouds": [
+          "AWS",
+          "GCP"
+        ],
+        "deployments": [
+          "ArgoCD",
+          "GitHub Actions"
+        ]
+      },
+      "diagnostic": {
+        "maturityLevel": "Industrialisation"
+      },
+      "challenges": {
+        "priorities": [
+          "Onboarding/Delivery",
+          "FinOps"
+        ]
+      },
+      "cta": {
+        "wantsDiagnostic": true
+      },
+      "status": "Nouveau",
+      "createdAt": "2026-01-26T10:00:00Z",
+      "updatedAt": "2026-01-26T10:00:00Z"
+    },
+    {
+      "id": "2",
+      "identity": {
+        "firstName": "Marie",
+        "lastName": "Martin",
+        "email": "marie.martin@startupxyz.io",
+        "phone": "0698765432",
+        "company": "StartupXYZ",
+        "position": "VP Engineering"
+      },
+      "techEcosystem": {
+        "teamSize": "<40",
+        "forges": [
+          "GitHub"
+        ],
+        "clouds": [
+          "AWS"
+        ],
+        "deployments": [
+          "GitHub Actions"
+        ]
+      },
+      "diagnostic": {
+        "maturityLevel": "Reconciliation"
+      },
+      "challenges": {
+        "priorities": [
+          "Conformite/Scoring"
+        ]
+      },
+      "cta": {
+        "wantsDiagnostic": false
+      },
+      "status": "Qualifie",
+      "createdAt": "2026-01-25T14:00:00Z",
+      "updatedAt": "2026-01-26T09:00:00Z"
+    },
+    {
+      "id": "754086a1-dc00-4f89-b1ba-27fbe6b47649",
+      "identity": {
+        "firstName": "Julien",
+        "lastName": "LUCAS",
+        "email": "julien.lucas@forge-it.io",
+        "phone": "0611223344",
+        "company": "Forge It",
+        "position": "CTO"
+      },
+      "techEcosystem": {
+        "teamSize": "<40",
+        "forges": [
+          "GitHub"
+        ],
+        "clouds": [
+          "AWS"
+        ],
+        "deployments": [
+          "ArgoCD",
+          "GitHub Actions"
+        ]
+      },
+      "diagnostic": {
+        "maturityLevel": "Industrialisation"
+      },
+      "challenges": {
+        "priorities": [
+          "Conformite/Scoring",
+          "FinOps"
+        ]
+      },
+      "cta": {
+        "wantsDiagnostic": true
+      },
+      "status": "Qualifie",
+      "createdAt": "2026-01-26T16:06:32.045Z",
+      "updatedAt": "2026-01-26T17:22:32.057Z"
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  AWS_REGION: eu-west-1
+  NODE_VERSION: '20'
+
+jobs:
+  deploy-lambda:
+    name: Deploy Lambda Functions
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install Lambda dependencies (auth)
+        working-directory: lambda/auth
+        run: |
+          NPM_TOKEN=dummy yarn install --immutable
+          zip -r ../auth.zip . -x '*.zip' -x 'node_modules/.cache/*'
+
+      - name: Install Lambda dependencies (authorizer)
+        working-directory: lambda/authorizer
+        run: |
+          NPM_TOKEN=dummy yarn install --immutable
+          zip -r ../authorizer.zip . -x '*.zip' -x 'node_modules/.cache/*'
+
+      - name: Install Lambda dependencies (crud)
+        working-directory: lambda/crud
+        run: |
+          NPM_TOKEN=dummy yarn install --immutable
+          zip -r ../crud.zip . -x '*.zip' -x 'node_modules/.cache/*'
+
+      - name: Install Lambda dependencies (recaptcha)
+        working-directory: lambda/recaptcha
+        run: |
+          NPM_TOKEN=dummy yarn install --immutable
+          zip -r ../recaptcha.zip . -x '*.zip' -x 'node_modules/.cache/*'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update Lambda function - auth
+        run: |
+          aws lambda update-function-code \
+            --function-name astro-qualif-auth-production \
+            --zip-file fileb://lambda/auth.zip
+
+      - name: Update Lambda function - authorizer
+        run: |
+          aws lambda update-function-code \
+            --function-name astro-qualif-authorizer-production \
+            --zip-file fileb://lambda/authorizer.zip
+
+      - name: Update Lambda function - crud
+        run: |
+          aws lambda update-function-code \
+            --function-name astro-qualif-crud-production \
+            --zip-file fileb://lambda/crud.zip
+
+      - name: Update Lambda function - recaptcha
+        run: |
+          aws lambda update-function-code \
+            --function-name astro-qualif-recaptcha-production \
+            --zip-file fileb://lambda/recaptcha.zip
+
+  deploy-frontend:
+    name: Deploy Frontend to S3/CloudFront
+    runs-on: ubuntu-latest
+    needs: deploy-lambda
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: NPM_TOKEN=dummy yarn install --immutable
+
+      - name: Build frontend
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_RECAPTCHA_SITE_KEY: ${{ secrets.VITE_RECAPTCHA_SITE_KEY }}
+        run: yarn build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Sync to S3
+        run: |
+          aws s3 sync dist/ s3://${{ secrets.S3_BUCKET_NAME }}/ \
+            --delete \
+            --cache-control "public, max-age=31536000, immutable" \
+            --exclude "index.html"
+
+      - name: Upload index.html with no-cache
+        run: |
+          aws s3 cp dist/index.html s3://${{ secrets.S3_BUCKET_NAME }}/index.html \
+            --cache-control "public, max-age=0, must-revalidate"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+
+      - name: Deployment summary
+        run: |
+          echo "Frontend deployed successfully!"
+          echo "URL: ${{ secrets.FRONTEND_URL }}"

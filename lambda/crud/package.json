@@ -1,0 +1,15 @@
+{
+  "name": "astro-qualif-crud-lambda",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "zip -r ../crud.zip . -x '*.zip' -x 'node_modules/.cache/*'"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.540.0",
+    "@aws-sdk/client-ses": "^3.981.0",
+    "@aws-sdk/lib-dynamodb": "^3.540.0"
+  },
+  "packageManager": "yarn@4.12.0"
+}

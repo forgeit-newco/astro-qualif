@@ -1,0 +1,14 @@
+{
+  "name": "astro-qualif-authorizer-lambda",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "zip -r ../authorizer.zip . -x '*.zip' -x 'node_modules/.cache/*'"
+  },
+  "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.540.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "packageManager": "yarn@4.12.0"
+}
