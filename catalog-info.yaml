@@ -1,31 +1,4 @@
 apiVersion: backstage.io/v1alpha1
-kind: System
-metadata:
-  name: astro-qualif
-  title: Astrolabe Qualification System
-  description: Système de qualification et gestion des prospects pour Astrolabe
-  tags:
-    - prospecting
-    - crm
-    - qualification
-    - react
-    - aws-lambda
-    - dynamodb
-  annotations:
-    github.com/project-slug: forgeit/astro-qualif
-    backstage.io/techdocs-ref: dir:.
-  links:
-    - url: https://qualif.forgeit.fr
-      title: Application Production
-      icon: web
-    - url: https://ypjx34j3e5.execute-api.eu-west-3.amazonaws.com/production
-      title: API Gateway
-      icon: api
-spec:
-  owner: group:forge-it
-  domain: customer-engagement
----
-apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: astro-qualif-frontend
@@ -51,8 +24,7 @@ metadata:
 spec:
   type: website
   lifecycle: production
-  owner: group:forge-it
-  system: astro-qualif
+  owner: group:astrolabe
   dependsOn:
     - component:astro-qualif-api-gateway
     - resource:astro-qualif-s3
@@ -79,8 +51,7 @@ metadata:
 spec:
   type: service
   lifecycle: production
-  owner: group:forge-it
-  system: astro-qualif
+  owner: group:astrolabe
   dependsOn:
     - resource:astro-qualif-dynamodb
     - resource:astro-qualif-ses
@@ -107,8 +78,7 @@ metadata:
 spec:
   type: service
   lifecycle: production
-  owner: group:forge-it
-  system: astro-qualif
+  owner: group:astrolabe
   dependsOn:
     - resource:astro-qualif-secrets-manager
   providesApis:
@@ -133,8 +103,7 @@ metadata:
 spec:
   type: service
   lifecycle: production
-  owner: group:forge-it
-  system: astro-qualif
+  owner: group:astrolabe
   dependsOn:
     - resource:astro-qualif-secrets-manager
 ---
@@ -157,8 +126,7 @@ metadata:
 spec:
   type: service
   lifecycle: production
-  owner: group:forge-it
-  system: astro-qualif
+  owner: group:astrolabe
   dependsOn:
     - resource:astro-qualif-secrets-manager
 ---
@@ -184,8 +152,7 @@ metadata:
 spec:
   type: service
   lifecycle: production
-  owner: group:forge-it
-  system: astro-qualif
+  owner: group:astrolabe
   dependsOn:
     - component:astro-qualif-lambda-crud
     - component:astro-qualif-lambda-auth
@@ -208,8 +175,7 @@ metadata:
 spec:
   type: openapi
   lifecycle: production
-  owner: group:forge-it
-  system: astro-qualif
+  owner: group:astrolabe
   definition: |
     openapi: 3.0.0
     info:
@@ -285,8 +251,7 @@ metadata:
 spec:
   type: database
   lifecycle: production
-  owner: group:forge-it
-  system: astro-qualif
+  owner: group:astrolabe
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Resource
@@ -305,8 +270,7 @@ metadata:
 spec:
   type: storage
   lifecycle: production
-  owner: group:forge-it
-  system: astro-qualif
+  owner: group:astrolabe
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Resource
@@ -327,8 +291,7 @@ metadata:
 spec:
   type: cdn
   lifecycle: production
-  owner: group:forge-it
-  system: astro-qualif
+  owner: group:astrolabe
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Resource
@@ -345,8 +308,7 @@ metadata:
 spec:
   type: secrets-manager
   lifecycle: production
-  owner: group:forge-it
-  system: astro-qualif
+  owner: group:astrolabe
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Resource
@@ -363,5 +325,4 @@ metadata:
 spec:
   type: email-service
   lifecycle: production
-  owner: group:forge-it
-  system: astro-qualif
+  owner: group:astrolabe
