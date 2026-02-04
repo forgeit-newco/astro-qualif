@@ -29,8 +29,6 @@ spec:
     - component:astro-qualif-api-gateway
     - resource:astro-qualif-s3
     - resource:astro-qualif-cloudfront
-  providesApis:
-    - astro-qualif-web-ui
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
