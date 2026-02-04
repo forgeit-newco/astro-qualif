@@ -36,7 +36,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: astro-qualif-lambda-crud
-  title: Astrolabe CRUD Lambda
+  title: Qualif Astrolabe CRUD Lambda
   description: Lambda function pour les opérations CRUD sur les prospects et la configuration des emails
   tags:
     - lambda
@@ -63,7 +63,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: astro-qualif-lambda-auth
-  title: Astrolabe Auth Lambda
+  title: Qualif Astrolabe Auth Lambda
   description: Lambda function pour l'authentification des administrateurs
   tags:
     - lambda
@@ -88,7 +88,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: astro-qualif-lambda-authorizer
-  title: Astrolabe JWT Authorizer
+  title: Qualif Astrolabe JWT Authorizer
   description: Lambda function pour valider les tokens JWT dans API Gateway
   tags:
     - lambda
@@ -111,7 +111,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: astro-qualif-lambda-recaptcha
-  title: Astrolabe reCAPTCHA Lambda
+  title: Qualif Astrolabe reCAPTCHA Lambda
   description: Lambda function pour valider les tokens Google reCAPTCHA
   tags:
     - lambda
@@ -134,7 +134,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: astro-qualif-api-gateway
-  title: Astrolabe API Gateway
+  title: Qualif Astrolabe API Gateway
   description: API Gateway REST exposant les endpoints du système
   tags:
     - api-gateway
@@ -238,7 +238,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
   name: astro-qualif-dynamodb
-  title: Astrolabe DynamoDB Table
+  title: Qualif Astrolabe DynamoDB Table
   description: Table DynamoDB pour stocker les prospects et la configuration
   tags:
     - dynamodb
@@ -257,7 +257,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
   name: astro-qualif-s3
-  title: Astrolabe S3 Bucket
+  title: Qualif Astrolabe S3 Bucket
   description: Bucket S3 pour héberger le frontend statique
   tags:
     - s3
@@ -276,7 +276,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
   name: astro-qualif-cloudfront
-  title: Astrolabe CloudFront Distribution
+  title: Qualif Astrolabe CloudFront Distribution
   description: Distribution CloudFront pour le CDN du frontend
   tags:
     - cloudfront
@@ -297,7 +297,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
   name: astro-qualif-secrets-manager
-  title: Astrolabe Secrets Manager
+  title: Qualif Astrolabe Secrets Manager
   description: AWS Secrets Manager pour stocker les secrets (JWT, admin credentials, reCAPTCHA)
   tags:
     - secrets-manager
@@ -314,7 +314,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
   name: astro-qualif-ses
-  title: Astrolabe SES
+  title: Qualif Astrolabe SES
   description: AWS Simple Email Service pour l'envoi des emails
   tags:
     - ses
