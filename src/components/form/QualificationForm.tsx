@@ -14,7 +14,6 @@ import { IdentityBlock } from './IdentityBlock';
 import { TechEcosystemBlock } from './TechEcosystemBlock';
 import { DiagnosticBlock } from './DiagnosticBlock';
 import { ChallengesBlock } from './ChallengesBlock';
-import { CTABlock } from './CTABlock';
 
 // reCAPTCHA site key from environment
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
@@ -46,10 +45,6 @@ const defaultValues: ProspectFormData = {
   },
   challenges: {
     priorities: '',
-  },
-  cta: {
-    wantsDiagnostic: false,
-    wantsTrial: false,
   },
 };
 
@@ -90,10 +85,8 @@ export function QualificationForm({ onSubmit, isSubmitting = false }: Qualificat
         <DiagnosticBlock />
         <Divider />
         <ChallengesBlock />
-        <Divider />
-        <CTABlock />
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, mt: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, mt: 4 }}>
           <ReCaptchaComponent
             ref={recaptchaRef}
             sitekey={RECAPTCHA_SITE_KEY}

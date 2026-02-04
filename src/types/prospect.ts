@@ -1,6 +1,6 @@
 // === CONSTANTES ===
 
-export const POSITIONS = ['CTO', 'VP Engineering', 'Tech Lead', 'Platform Engineer'] as const;
+export const POSITIONS = ['CTO', 'VP Engineering', 'Tech Lead', 'Platform Engineer', 'Engineering manager', 'Developer', 'Other'] as const;
 export type Position = (typeof POSITIONS)[number];
 
 export const TEAM_SIZES = ['<40', '40-100', '100+'] as const;
@@ -65,17 +65,11 @@ export interface ProspectChallenges {
   priorities: string;
 }
 
-export interface ProspectCTA {
-  wantsDiagnostic: boolean;
-  wantsTrial: boolean;
-}
-
 export interface ProspectFormData {
   identity: ProspectIdentity;
   techEcosystem: ProspectTechEcosystem;
   diagnostic: ProspectDiagnostic;
   challenges: ProspectChallenges;
-  cta: ProspectCTA;
 }
 
 // === ENTITÉ COMPLÈTE ===

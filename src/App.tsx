@@ -3,11 +3,13 @@ import { ThemeProvider, CssBaseline, Box, AppBar, Toolbar, Typography, Button } 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import ViewKanbanIcon from '@mui/icons-material/ViewKanban';
+import EmailIcon from '@mui/icons-material/Email';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { astrolabeTheme } from './theme/astrolabeTheme';
 import { FormPage } from './pages/FormPage';
 import { KanbanPage } from './pages/KanbanPage';
 import { LoginPage } from './pages/LoginPage';
+import { EmailConfigPage } from './pages/EmailConfigPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './hooks/useAuth';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -91,6 +93,22 @@ function Navigation() {
         {isAuthenticated && (
           <Button
             color="inherit"
+            startIcon={<EmailIcon />}
+            onClick={() => navigate('/admin/email-config')}
+            sx={{
+              mx: 1,
+              borderBottom: location.pathname === '/admin/email-config' ? 2 : 0,
+              borderColor: 'secondary.main',
+              borderRadius: 0,
+            }}
+          >
+            Email Config
+          </Button>
+        )}
+
+        {isAuthenticated && (
+          <Button
+            color="inherit"
             startIcon={<LogoutIcon />}
             onClick={handleLogout}
             sx={{ ml: 1 }}
@@ -117,6 +135,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <KanbanPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/email-config"
+            element={
+              <ProtectedRoute>
+                <EmailConfigPage />
               </ProtectedRoute>
             }
           />

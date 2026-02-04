@@ -1,10 +1,9 @@
 import { useRef } from 'react';
-import { Box, Card, CardContent, Typography, Chip, IconButton } from '@mui/material';
+import { Box, Card, CardContent, Typography, Chip } from '@mui/material';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import BusinessIcon from '@mui/icons-material/Business';
 import GroupIcon from '@mui/icons-material/Group';
-import EventNoteIcon from '@mui/icons-material/EventNote';
 import type { Prospect } from '../../types/prospect';
 
 interface ProspectCardProps {
@@ -60,16 +59,9 @@ export function ProspectCard({ prospect, onOpenDetail }: ProspectCardProps) {
       }}
     >
       <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-          <Typography variant="subtitle1" fontWeight={600} sx={{ color: 'text.primary' }}>
-            {fullName}
-          </Typography>
-          {prospect.cta.wantsDiagnostic && (
-            <IconButton size="small" color="secondary" sx={{ p: 0.5 }}>
-              <EventNoteIcon fontSize="small" />
-            </IconButton>
-          )}
-        </Box>
+        <Typography variant="subtitle1" fontWeight={600} sx={{ color: 'text.primary', mb: 1 }}>
+          {fullName}
+        </Typography>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
           <BusinessIcon sx={{ fontSize: 16, color: 'text.secondary' }} />

@@ -1,29 +1,9 @@
 import type { Prospect, ProspectFormData, ProspectStatus } from '../types/prospect';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-
-// Get auth token from localStorage
-function getAuthToken(): string | null {
-  return localStorage.getItem('auth_token');
-}
-
-// Add Authorization header if token exists
-function getHeaders(): HeadersInit {
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-  };
-
-  const token = getAuthToken();
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  return headers;
-}
+import { API_BASE, getHeaders, authenticatedFetch } from '../utils/api';
 
 export const prospectsApi = {
   getAll: async (): Promise<Prospect[]> => {
-    const response = await fetch(`${API_BASE}/prospects`, {
+    const response = await authenticatedFetch(`${API_BASE}/prospects`, {
       headers: getHeaders(),
     });
     if (!response.ok) {
@@ -33,7 +13,7 @@ export const prospectsApi = {
   },
 
   getById: async (id: string): Promise<Prospect> => {
-    const response = await fetch(`${API_BASE}/prospects/${id}`, {
+    const response = await authenticatedFetch(`${API_BASE}/prospects/${id}`, {
       headers: getHeaders(),
     });
     if (!response.ok) {
@@ -56,7 +36,7 @@ export const prospectsApi = {
   },
 
   updateStatus: async (id: string, status: ProspectStatus): Promise<Prospect> => {
-    const response = await fetch(`${API_BASE}/prospects/${id}`, {
+    const response = await authenticatedFetch(`${API_BASE}/prospects/${id}`, {
       method: 'PATCH',
       headers: getHeaders(),
       body: JSON.stringify({ status }),
@@ -69,7 +49,7 @@ export const prospectsApi = {
   },
 
   update: async (id: string, data: Partial<Prospect>): Promise<Prospect> => {
-    const response = await fetch(`${API_BASE}/prospects/${id}`, {
+    const response = await authenticatedFetch(`${API_BASE}/prospects/${id}`, {
       method: 'PATCH',
       headers: getHeaders(),
       body: JSON.stringify(data),
@@ -82,7 +62,7 @@ export const prospectsApi = {
   },
 
   delete: async (id: string): Promise<void> => {
-    const response = await fetch(`${API_BASE}/prospects/${id}`, {
+    const response = await authenticatedFetch(`${API_BASE}/prospects/${id}`, {
       method: 'DELETE',
       headers: getHeaders(),
     });

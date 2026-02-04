@@ -21,6 +21,34 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 // URL du logo Forge IT (hébergé sur CloudFront)
 const LOGO_URL = "https://qualif.forgeit.fr/assets/logo-forgeit.png";
 
+// Default email templates (empty - user will provide content via admin UI)
+const DEFAULT_TEMPLATES = {
+  'Productivité & Delivery': {
+    constat: '',
+    solution: '',
+  },
+  'Onboarding & Rétention': {
+    constat: '',
+    solution: '',
+  },
+  'Qualité & Conformité': {
+    constat: '',
+    solution: '',
+  },
+  'Standardisation': {
+    constat: '',
+    solution: '',
+  },
+  'Visibilité sur les releases': {
+    constat: '',
+    solution: '',
+  },
+  'Maîtrise des coûts cloud': {
+    constat: '',
+    solution: '',
+  },
+};
+
 function corsHeaders(origin = '*') {
   return {
     'Access-Control-Allow-Origin': origin,
@@ -48,7 +76,6 @@ function formatProspectEmail(prospect) {
     techEcosystem,
     diagnostic,
     challenges,
-    cta,
     status,
     createdAt,
   } = prospect;
@@ -69,7 +96,6 @@ function formatProspectEmail(prospect) {
     .chip { display: inline-block; background-color: #e9ecef; padding: 4px 12px; margin: 2px; border-radius: 12px; font-size: 13px; }
     .badge { display: inline-block; padding: 6px 12px; border-radius: 4px; font-weight: bold; }
     .badge-nouveau { background-color: #67E083; color: white; }
-    .cta-box { background-color: #f1f7f7; border: 2px solid #67E083; border-radius: 8px; padding: 15px; margin: 10px 0; }
     .footer { text-align: center; color: #6c757d; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #dee2e6; }
   </style>
 </head>
@@ -164,25 +190,6 @@ function formatProspectEmail(prospect) {
     </div>
   </div>
 
-  <!-- Section CTA -->
-  ${cta.wantsDiagnostic || cta.wantsTrial ? `
-  <div class="section">
-    <div class="section-title">💡 Prochaines Étapes</div>
-    ${cta.wantsDiagnostic ? `
-    <div class="cta-box">
-      <strong>✅ Demande de diagnostic 30 min</strong>
-      <p style="margin: 5px 0 0 0;">Le prospect souhaite un diagnostic de maturité GRATUIT avec nos experts.</p>
-    </div>
-    ` : ''}
-    ${cta.wantsTrial ? `
-    <div class="cta-box">
-      <strong>✅ Demande de version d'essai d'Astrolabe</strong>
-      <p style="margin: 5px 0 0 0;">Le prospect souhaite tester Astrolabe gratuitement.</p>
-    </div>
-    ` : ''}
-  </div>
-  ` : ''}
-
   <!-- Footer -->
   <div class="footer">
     <p><strong>Date de création :</strong> ${new Date(createdAt).toLocaleString('fr-FR')}</p>
@@ -230,9 +237,56 @@ async function sendProspectNotification(prospect) {
   }
 }
 
+// Generate challenge-specific content for email
+function generateChallengeContent(prospect, templates) {
+  if (!prospect.challenges?.priorities || !templates) {
+    return '';
+  }
+
+  const challenge = prospect.challenges.priorities;
+
+  // Handle "Autre: ..." custom challenges - no personalization
+  if (challenge.startsWith('Autre:')) {
+    return '';
+  }
+
+  const template = templates[challenge];
+  if (!template || (!template.constat && !template.solution)) {
+    return '';
+  }
+
+  // Simple HTML escaping
+  const escape = (str) => str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+  return `
+    <div class="challenge-section">
+      ${template.constat ? `
+        <div class="challenge-block-constat">
+          <h3>Le constat</h3>
+          <p>${escape(template.constat)}</p>
+        </div>
+      ` : ''}
+      ${template.solution ? `
+        <div class="challenge-block-solution">
+          <h3>Ce qu'Astrolabe apporte</h3>
+          <p>${escape(template.solution)}</p>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
 // Format client welcome email
-function formatWelcomeEmail(prospect) {
+function formatWelcomeEmail(prospect, templates = null) {
   const { identity } = prospect;
+
+  // Generate challenge-specific content
+  const challengeContent = generateChallengeContent(prospect, templates);
 
   return `
 <!DOCTYPE html>
@@ -249,6 +303,43 @@ function formatWelcomeEmail(prospect) {
     .greeting { color: #29624D; font-size: 20px; font-weight: bold; margin-bottom: 20px; }
     .message { color: #333; font-size: 16px; line-height: 1.8; margin-bottom: 20px; }
     .highlight { color: #29624D; font-weight: bold; }
+    .challenge-section { margin: 30px 0; }
+    .challenge-block-constat {
+      background-color: #FFF5F0;
+      border-left: 4px solid #FF8C42;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+    }
+    .challenge-block-constat h3 {
+      color: #FF8C42;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 0 0 10px 0;
+    }
+    .challenge-block-constat p {
+      margin: 0;
+      line-height: 1.6;
+      color: #333;
+    }
+    .challenge-block-solution {
+      background-color: #F1F7F7;
+      border-left: 4px solid #29624D;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+    }
+    .challenge-block-solution h3 {
+      color: #29624D;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 0 0 10px 0;
+    }
+    .challenge-block-solution p {
+      margin: 0;
+      line-height: 1.6;
+      color: #333;
+    }
     .cta-box { background-color: #F1F7F7; border-left: 4px solid #67E083; border-radius: 8px; padding: 20px; margin: 30px 0; }
     .cta-box p { margin: 0; color: #29624D; font-size: 15px; }
     .contact { background-color: #F1F7F7; border-radius: 8px; padding: 20px; margin-top: 30px; text-align: center; }
@@ -276,6 +367,9 @@ function formatWelcomeEmail(prospect) {
       <div class="message">
         Votre demande a bien été reçue et nous avons pris connaissance de vos besoins. Notre équipe d'experts va étudier votre profil et reviendra vers vous très prochainement pour enclencher la suite de notre collaboration.
       </div>
+
+      <!-- Personalized challenge content -->
+      ${challengeContent}
 
       <div class="cta-box">
         <p>💡 <strong>Prochaines étapes :</strong> Un de nos experts Platform Engineering vous contactera sous peu pour échanger sur votre projet et vos enjeux de maturité DevOps.</p>
@@ -315,6 +409,16 @@ async function sendWelcomeEmail(prospect) {
     return;
   }
 
+  // Fetch templates configuration
+  let templates = null;
+  try {
+    const config = await getEmailTemplateConfig();
+    templates = config.templates;
+  } catch (error) {
+    console.error('Failed to fetch email templates:', error);
+    // Continue without personalization
+  }
+
   const emailParams = {
     Source: ADMIN_EMAIL,
     Destination: {
@@ -322,12 +426,12 @@ async function sendWelcomeEmail(prospect) {
     },
     Message: {
       Subject: {
-        Data: `Bienvenue chez Forge IT - Votre demande a bien été reçue`,
+        Data: `Bienvenue chez Forge IT`,
         Charset: 'UTF-8',
       },
       Body: {
         Html: {
-          Data: formatWelcomeEmail(prospect),
+          Data: formatWelcomeEmail(prospect, templates),
           Charset: 'UTF-8',
         },
       },
@@ -343,6 +447,59 @@ async function sendWelcomeEmail(prospect) {
     // Don't throw - we don't want email failures to block prospect creation
   }
 }
+
+// === EMAIL TEMPLATE CONFIGURATION ===
+
+// GET /config/email-templates - Get email template configuration
+async function getEmailTemplateConfig() {
+  const command = new GetCommand({
+    TableName: DYNAMODB_TABLE,
+    Key: {
+      PK: 'CONFIG#email_templates',
+      SK: 'METADATA',
+    },
+  });
+
+  const result = await docClient.send(command);
+
+  if (!result.Item) {
+    // Return default empty templates
+    return {
+      PK: 'CONFIG#email_templates',
+      SK: 'METADATA',
+      version: '1.0',
+      templates: DEFAULT_TEMPLATES,
+      updatedAt: null,
+      updatedBy: null,
+    };
+  }
+
+  return result.Item;
+}
+
+// PUT /config/email-templates - Update email template configuration
+async function updateEmailTemplateConfig(data, userEmail) {
+  const now = new Date().toISOString();
+
+  const config = {
+    PK: 'CONFIG#email_templates',
+    SK: 'METADATA',
+    version: '1.0',
+    templates: data.templates,
+    updatedAt: now,
+    updatedBy: userEmail || 'unknown',
+  };
+
+  const command = new PutCommand({
+    TableName: DYNAMODB_TABLE,
+    Item: config,
+  });
+
+  await docClient.send(command);
+  return config;
+}
+
+// === PROSPECT CRUD ===
 
 // GET /prospects - List all prospects
 async function listProspects() {
@@ -480,7 +637,27 @@ export async function handler(event) {
   try {
     const { httpMethod, pathParameters, body } = event;
     const id = pathParameters?.id;
+    const path = event.path || event.rawPath || '';
 
+    // Handle config endpoints
+    if (path.includes('/config/email-templates')) {
+      switch (httpMethod) {
+        case 'GET':
+          const config = await getEmailTemplateConfig();
+          return response(200, config, origin);
+
+        case 'PUT':
+          const updateData = JSON.parse(body || '{}');
+          const userEmail = event.requestContext?.authorizer?.email || 'admin';
+          const updatedConfig = await updateEmailTemplateConfig(updateData, userEmail);
+          return response(200, updatedConfig, origin);
+
+        default:
+          return response(405, { error: 'Method not allowed' }, origin);
+      }
+    }
+
+    // Handle prospect endpoints
     switch (httpMethod) {
       case 'GET':
         if (id) {

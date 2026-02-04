@@ -22,8 +22,6 @@ import BuildIcon from '@mui/icons-material/Build';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 import MonitorHeartIcon from '@mui/icons-material/MonitorHeart';
 import FlagIcon from '@mui/icons-material/Flag';
-import EventNoteIcon from '@mui/icons-material/EventNote';
-import ScienceIcon from '@mui/icons-material/Science';
 import DeleteIcon from '@mui/icons-material/Delete';
 import type { Prospect } from '../../types/prospect';
 import { statusColors } from '../../theme/astrolabeTheme';
@@ -202,29 +200,6 @@ export function ProspectDetailModal({ prospect, open, onClose, onDelete }: Prosp
             />
           </Box>
         </Box>
-
-        {/* Section CTA */}
-        {(prospect.cta.wantsDiagnostic || prospect.cta.wantsTrial) && (
-          <>
-            <Divider sx={{ my: 2 }} />
-            {prospect.cta.wantsDiagnostic && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1.5, bgcolor: 'action.hover', borderRadius: 1, mb: prospect.cta.wantsTrial ? 1 : 0 }}>
-                <EventNoteIcon sx={{ color: 'secondary.main' }} />
-                <Typography variant="body2" fontWeight={500}>
-                  Demande de diagnostic 30 min
-                </Typography>
-              </Box>
-            )}
-            {prospect.cta.wantsTrial && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1.5, bgcolor: 'action.hover', borderRadius: 1 }}>
-                <ScienceIcon sx={{ color: 'secondary.main' }} />
-                <Typography variant="body2" fontWeight={500}>
-                  Demande de version d'essai d'Astrolabe
-                </Typography>
-              </Box>
-            )}
-          </>
-        )}
 
         {/* Dates */}
         <Box sx={{ mt: 3, pt: 2, borderTop: 1, borderColor: 'divider' }}>

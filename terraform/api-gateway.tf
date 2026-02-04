@@ -53,6 +53,18 @@ resource "aws_api_gateway_resource" "verify_recaptcha" {
   path_part   = "verify-recaptcha"
 }
 
+resource "aws_api_gateway_resource" "config" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  parent_id   = aws_api_gateway_rest_api.main.root_resource_id
+  path_part   = "config"
+}
+
+resource "aws_api_gateway_resource" "email_templates" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  parent_id   = aws_api_gateway_resource.config.id
+  path_part   = "email-templates"
+}
+
 # POST /auth/login (no auth required)
 resource "aws_api_gateway_method" "login_post" {
   rest_api_id   = aws_api_gateway_rest_api.main.id
@@ -221,6 +233,87 @@ resource "aws_api_gateway_integration" "verify_recaptcha_post" {
   uri                     = aws_lambda_function.recaptcha.invoke_arn
 }
 
+# GET /config/email-templates (protected)
+resource "aws_api_gateway_method" "email_templates_get" {
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  resource_id   = aws_api_gateway_resource.email_templates.id
+  http_method   = "GET"
+  authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.jwt.id
+}
+
+resource "aws_api_gateway_integration" "email_templates_get" {
+  rest_api_id             = aws_api_gateway_rest_api.main.id
+  resource_id             = aws_api_gateway_resource.email_templates.id
+  http_method             = aws_api_gateway_method.email_templates_get.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.crud.invoke_arn
+}
+
+# PUT /config/email-templates (protected)
+resource "aws_api_gateway_method" "email_templates_put" {
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  resource_id   = aws_api_gateway_resource.email_templates.id
+  http_method   = "PUT"
+  authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.jwt.id
+}
+
+resource "aws_api_gateway_integration" "email_templates_put" {
+  rest_api_id             = aws_api_gateway_rest_api.main.id
+  resource_id             = aws_api_gateway_resource.email_templates.id
+  http_method             = aws_api_gateway_method.email_templates_put.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.crud.invoke_arn
+}
+
+# OPTIONS /config/email-templates (CORS)
+resource "aws_api_gateway_method" "email_templates_options" {
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  resource_id   = aws_api_gateway_resource.email_templates.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "email_templates_options" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.email_templates.id
+  http_method = aws_api_gateway_method.email_templates_options.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_method_response" "email_templates_options" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.email_templates.id
+  http_method = aws_api_gateway_method.email_templates_options.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "email_templates_options" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.email_templates.id
+  http_method = aws_api_gateway_method.email_templates_options.http_method
+  status_code = aws_api_gateway_method_response.email_templates_options.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,PUT,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+}
+
 # OPTIONS methods for CORS (add for all resources)
 resource "aws_api_gateway_method" "prospects_options" {
   rest_api_id   = aws_api_gateway_rest_api.main.id
@@ -367,6 +460,8 @@ resource "aws_api_gateway_deployment" "main" {
       aws_api_gateway_resource.prospects.id,
       aws_api_gateway_resource.prospect_id.id,
       aws_api_gateway_resource.verify_recaptcha.id,
+      aws_api_gateway_resource.config.id,
+      aws_api_gateway_resource.email_templates.id,
       aws_api_gateway_method.login_post.id,
       aws_api_gateway_method.login_options.id,
       aws_api_gateway_method.prospects_get.id,
@@ -378,6 +473,9 @@ resource "aws_api_gateway_deployment" "main" {
       aws_api_gateway_method.prospect_id_options.id,
       aws_api_gateway_method.verify_recaptcha_post.id,
       aws_api_gateway_method.verify_recaptcha_options.id,
+      aws_api_gateway_method.email_templates_get.id,
+      aws_api_gateway_method.email_templates_put.id,
+      aws_api_gateway_method.email_templates_options.id,
       aws_api_gateway_integration.login_post.id,
       aws_api_gateway_integration.login_options.id,
       aws_api_gateway_integration.prospects_get.id,
@@ -389,6 +487,9 @@ resource "aws_api_gateway_deployment" "main" {
       aws_api_gateway_integration.prospect_id_options.id,
       aws_api_gateway_integration.verify_recaptcha_post.id,
       aws_api_gateway_integration.verify_recaptcha_options.id,
+      aws_api_gateway_integration.email_templates_get.id,
+      aws_api_gateway_integration.email_templates_put.id,
+      aws_api_gateway_integration.email_templates_options.id,
     ]))
   }
 

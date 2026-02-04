@@ -33,7 +33,6 @@ export function KanbanColumn({ status, prospects, onOpenDetail }: KanbanColumnPr
         border: 1,
         borderColor: isOver ? 'secondary.main' : 'divider',
         transition: 'all 0.2s',
-        maxHeight: 'calc(100vh - 200px)',
       }}
     >
       {/* Header */}
@@ -80,8 +79,6 @@ export function KanbanColumn({ status, prospects, onOpenDetail }: KanbanColumnPr
           display: 'flex',
           flexDirection: 'column',
           gap: 1.5,
-          overflowY: 'auto',
-          flexGrow: 1,
         }}
       >
         <SortableContext items={prospects.map((p) => p.id)} strategy={verticalListSortingStrategy}>

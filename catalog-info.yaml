@@ -1,0 +1,366 @@
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: astro-qualif
+  title: Astrolabe Qualification System
+  description: Système de qualification et gestion des prospects pour Astrolabe
+  tags:
+    - prospecting
+    - crm
+    - qualification
+    - react
+    - aws-lambda
+    - dynamodb
+  annotations:
+    github.com/project-slug: forgeit/astro-qualif
+    backstage.io/techdocs-ref: dir:.
+  links:
+    - url: https://qualif.forgeit.fr
+      title: Application Production
+      icon: web
+    - url: https://ypjx34j3e5.execute-api.eu-west-3.amazonaws.com/production
+      title: API Gateway
+      icon: api
+spec:
+  owner: group:forge-it
+  domain: customer-engagement
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: astro-qualif-frontend
+  title: Astrolabe Qualification Frontend
+  description: Application web React pour la qualification des prospects et gestion du kanban
+  tags:
+    - react
+    - typescript
+    - material-ui
+    - vite
+    - frontend
+  annotations:
+    github.com/project-slug: forgeit/astro-qualif
+    backstage.io/techdocs-ref: dir:.
+  links:
+    - url: https://qualif.forgeit.fr
+      title: Production
+      icon: web
+    - url: https://qualif.forgeit.fr/kanban
+      title: Kanban Admin
+      icon: dashboard
+spec:
+  type: website
+  lifecycle: production
+  owner: group:forge-it
+  system: astro-qualif
+  dependsOn:
+    - component:astro-qualif-api-gateway
+    - resource:astro-qualif-s3
+    - resource:astro-qualif-cloudfront
+  providesApis:
+    - astro-qualif-web-ui
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: astro-qualif-lambda-crud
+  title: Astrolabe CRUD Lambda
+  description: Lambda function pour les opérations CRUD sur les prospects et la configuration des emails
+  tags:
+    - lambda
+    - nodejs
+    - dynamodb
+    - ses
+    - backend
+  annotations:
+    github.com/project-slug: forgeit/astro-qualif
+    aws.com/lambda-function-name: astro-qualif-crud-production
+    aws.com/lambda-region: eu-west-3
+spec:
+  type: service
+  lifecycle: production
+  owner: group:forge-it
+  system: astro-qualif
+  dependsOn:
+    - resource:astro-qualif-dynamodb
+    - resource:astro-qualif-ses
+  providesApis:
+    - astro-qualif-prospects-api
+    - astro-qualif-email-config-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: astro-qualif-lambda-auth
+  title: Astrolabe Auth Lambda
+  description: Lambda function pour l'authentification des administrateurs
+  tags:
+    - lambda
+    - nodejs
+    - jwt
+    - authentication
+    - backend
+  annotations:
+    github.com/project-slug: forgeit/astro-qualif
+    aws.com/lambda-function-name: astro-qualif-auth-production
+    aws.com/lambda-region: eu-west-3
+spec:
+  type: service
+  lifecycle: production
+  owner: group:forge-it
+  system: astro-qualif
+  dependsOn:
+    - resource:astro-qualif-secrets-manager
+  providesApis:
+    - astro-qualif-auth-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: astro-qualif-lambda-authorizer
+  title: Astrolabe JWT Authorizer
+  description: Lambda function pour valider les tokens JWT dans API Gateway
+  tags:
+    - lambda
+    - nodejs
+    - jwt
+    - api-gateway
+    - backend
+  annotations:
+    github.com/project-slug: forgeit/astro-qualif
+    aws.com/lambda-function-name: astro-qualif-authorizer-production
+    aws.com/lambda-region: eu-west-3
+spec:
+  type: service
+  lifecycle: production
+  owner: group:forge-it
+  system: astro-qualif
+  dependsOn:
+    - resource:astro-qualif-secrets-manager
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: astro-qualif-lambda-recaptcha
+  title: Astrolabe reCAPTCHA Lambda
+  description: Lambda function pour valider les tokens Google reCAPTCHA
+  tags:
+    - lambda
+    - nodejs
+    - recaptcha
+    - security
+    - backend
+  annotations:
+    github.com/project-slug: forgeit/astro-qualif
+    aws.com/lambda-function-name: astro-qualif-recaptcha-production
+    aws.com/lambda-region: eu-west-3
+spec:
+  type: service
+  lifecycle: production
+  owner: group:forge-it
+  system: astro-qualif
+  dependsOn:
+    - resource:astro-qualif-secrets-manager
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: astro-qualif-api-gateway
+  title: Astrolabe API Gateway
+  description: API Gateway REST exposant les endpoints du système
+  tags:
+    - api-gateway
+    - rest-api
+    - aws
+    - backend
+  annotations:
+    github.com/project-slug: forgeit/astro-qualif
+    aws.com/api-gateway-id: ypjx34j3e5
+    aws.com/api-gateway-region: eu-west-3
+  links:
+    - url: https://ypjx34j3e5.execute-api.eu-west-3.amazonaws.com/production
+      title: Production API
+      icon: api
+spec:
+  type: service
+  lifecycle: production
+  owner: group:forge-it
+  system: astro-qualif
+  dependsOn:
+    - component:astro-qualif-lambda-crud
+    - component:astro-qualif-lambda-auth
+    - component:astro-qualif-lambda-authorizer
+    - component:astro-qualif-lambda-recaptcha
+  providesApis:
+    - astro-qualif-rest-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: astro-qualif-rest-api
+  title: Astrolabe Qualification REST API
+  description: API REST pour la gestion des prospects et la configuration
+  tags:
+    - rest
+    - openapi
+    - prospects
+    - email-config
+spec:
+  type: openapi
+  lifecycle: production
+  owner: group:forge-it
+  system: astro-qualif
+  definition: |
+    openapi: 3.0.0
+    info:
+      title: Astrolabe Qualification API
+      version: 1.0.0
+      description: API pour la gestion des prospects et la configuration des emails
+    paths:
+      /auth/login:
+        post:
+          summary: Authentification admin
+          tags: [Authentication]
+      /prospects:
+        get:
+          summary: Liste des prospects
+          tags: [Prospects]
+          security:
+            - bearerAuth: []
+        post:
+          summary: Créer un prospect
+          tags: [Prospects]
+      /prospects/{id}:
+        get:
+          summary: Détails d'un prospect
+          tags: [Prospects]
+          security:
+            - bearerAuth: []
+        patch:
+          summary: Modifier un prospect
+          tags: [Prospects]
+          security:
+            - bearerAuth: []
+        delete:
+          summary: Supprimer un prospect
+          tags: [Prospects]
+          security:
+            - bearerAuth: []
+      /config/email-templates:
+        get:
+          summary: Récupérer la configuration des emails
+          tags: [Configuration]
+          security:
+            - bearerAuth: []
+        put:
+          summary: Mettre à jour la configuration des emails
+          tags: [Configuration]
+          security:
+            - bearerAuth: []
+      /verify-recaptcha:
+        post:
+          summary: Vérifier un token reCAPTCHA
+          tags: [Security]
+    components:
+      securitySchemes:
+        bearerAuth:
+          type: http
+          scheme: bearer
+          bearerFormat: JWT
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: astro-qualif-dynamodb
+  title: Astrolabe DynamoDB Table
+  description: Table DynamoDB pour stocker les prospects et la configuration
+  tags:
+    - dynamodb
+    - database
+    - nosql
+    - aws
+  annotations:
+    aws.com/dynamodb-table-name: astro-qualif-db-production
+    aws.com/dynamodb-region: eu-west-3
+spec:
+  type: database
+  lifecycle: production
+  owner: group:forge-it
+  system: astro-qualif
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: astro-qualif-s3
+  title: Astrolabe S3 Bucket
+  description: Bucket S3 pour héberger le frontend statique
+  tags:
+    - s3
+    - storage
+    - static-hosting
+    - aws
+  annotations:
+    aws.com/s3-bucket-name: astro-qualif-frontend-production-307946660984
+    aws.com/s3-region: eu-west-3
+spec:
+  type: storage
+  lifecycle: production
+  owner: group:forge-it
+  system: astro-qualif
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: astro-qualif-cloudfront
+  title: Astrolabe CloudFront Distribution
+  description: Distribution CloudFront pour le CDN du frontend
+  tags:
+    - cloudfront
+    - cdn
+    - aws
+  annotations:
+    aws.com/cloudfront-distribution-id: E3VT2AVVZZZGR8
+  links:
+    - url: https://qualif.forgeit.fr
+      title: Production CDN
+      icon: web
+spec:
+  type: cdn
+  lifecycle: production
+  owner: group:forge-it
+  system: astro-qualif
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: astro-qualif-secrets-manager
+  title: Astrolabe Secrets Manager
+  description: AWS Secrets Manager pour stocker les secrets (JWT, admin credentials, reCAPTCHA)
+  tags:
+    - secrets-manager
+    - security
+    - aws
+  annotations:
+    aws.com/secrets-manager-region: eu-west-3
+spec:
+  type: secrets-manager
+  lifecycle: production
+  owner: group:forge-it
+  system: astro-qualif
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: astro-qualif-ses
+  title: Astrolabe SES
+  description: AWS Simple Email Service pour l'envoi des emails
+  tags:
+    - ses
+    - email
+    - aws
+  annotations:
+    aws.com/ses-region: eu-west-3
+spec:
+  type: email-service
+  lifecycle: production
+  owner: group:forge-it
+  system: astro-qualif
