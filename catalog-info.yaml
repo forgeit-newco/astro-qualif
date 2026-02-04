@@ -40,6 +40,7 @@ metadata:
   annotations:
     github.com/project-slug: forgeit/astro-qualif
     backstage.io/techdocs-ref: dir:.
+    aws.amazon.com/cost-insights-tags: Application=astro-qualif
   links:
     - url: https://qualif.forgeit.fr
       title: Production
