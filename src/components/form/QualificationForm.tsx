@@ -42,10 +42,10 @@ const defaultValues: ProspectFormData = {
     monitoringTools: [],
   },
   diagnostic: {
-    maturityLevel: 'Industrialisation',
+    maturityLevel: 'Pas encore à l\'agenda',
   },
   challenges: {
-    priorities: [],
+    priorities: '',
   },
   cta: {
     wantsDiagnostic: false,
@@ -115,7 +115,7 @@ export function QualificationForm({ onSubmit, isSubmitting = false }: Qualificat
             {isSubmitting ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
-              'Soumettre la qualification'
+              'Valider'
             )}
           </Button>
         </Box>

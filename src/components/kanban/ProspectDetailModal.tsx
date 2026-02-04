@@ -191,20 +191,15 @@ export function ProspectDetailModal({ prospect, open, onClose, onDelete }: Prosp
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
             <FlagIcon sx={{ fontSize: 18, color: 'text.secondary', mt: 0.3 }} />
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-              {prospect.challenges.priorities.map((priority) => (
-                <Chip
-                  key={priority}
-                  label={priority}
-                  size="small"
-                  sx={{
-                    bgcolor: 'secondary.main',
-                    color: 'primary.dark',
-                    fontWeight: 500,
-                  }}
-                />
-              ))}
-            </Box>
+            <Chip
+              label={prospect.challenges.priorities}
+              size="small"
+              sx={{
+                bgcolor: 'secondary.main',
+                color: 'primary.dark',
+                fontWeight: 500,
+              }}
+            />
           </Box>
         </Box>
 

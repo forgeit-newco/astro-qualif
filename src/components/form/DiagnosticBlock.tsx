@@ -13,10 +13,10 @@ import { useFormContext, Controller } from 'react-hook-form';
 import { MATURITY_LEVELS, type ProspectFormData } from '../../types/prospect';
 
 const MATURITY_DESCRIPTIONS: Record<string, string> = {
-  Industrialisation: 'Imposer des standards / Golden Paths',
-  Expertise: "Maintenance d'un Backstage existant",
-  Reconciliation: 'Souffrance liée à la fragmentation des outils',
-  'Autre/Ne sait pas': "Besoin d'aide pour évaluer la maturité",
+  'Pas encore à l\'agenda': 'On a d\'autres priorités tech cette année',
+  'En réflexion / POC prévu': 'On explore le sujet, on benchmark les solutions',
+  'On a un Backstage ou une solution maison': 'Ça tourne, mais l\'adoption ou la maintenance pose question',
+  'On cherche à scaler /industrialiser': 'C\'est en place, mais on veut aller plus loin',
 };
 
 export function DiagnosticBlock() {

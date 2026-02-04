@@ -1,4 +1,4 @@
-import { Box, Container, Typography, Paper, Alert, Snackbar } from '@mui/material';
+import { Box, Container, Typography, Paper, Alert, Snackbar, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import { useState } from 'react';
 import { QualificationForm } from '../components/form/QualificationForm';
 import { useProspects } from '../hooks/useProspects';
@@ -8,14 +8,16 @@ export function FormPage() {
   const { createProspectAsync, isCreating } = useProspects({ enabled: false });
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [submittedData, setSubmittedData] = useState<ProspectFormData | null>(null);
 
   const handleSubmit = async (data: ProspectFormData) => {
     try {
       await createProspectAsync(data);
+      setSubmittedData(data);
       setSuccess(true);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+      setError('Oops une erreur s\'est glissée dans le processus');
     }
   };
 
@@ -33,16 +35,37 @@ export function FormPage() {
           <QualificationForm onSubmit={handleSubmit} isSubmitting={isCreating} />
         </Paper>
 
-        <Snackbar
+        <Dialog
           open={success}
-          autoHideDuration={4000}
           onClose={() => setSuccess(false)}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          maxWidth="sm"
+          fullWidth
         >
-          <Alert severity="success" onClose={() => setSuccess(false)} sx={{ width: '100%' }}>
-            Demande enregistrée avec succès ! Bienvenue chez Forge It.
-          </Alert>
-        </Snackbar>
+          <DialogTitle sx={{ color: 'primary.main', fontWeight: 600 }}>
+            Bienvenue {submittedData?.identity.firstName} chez Forge It
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              Merci pour votre sollicitation
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              Un email vous a été envoyé avec les prochaines étapes.
+            </Typography>
+            <Alert severity="info" sx={{ mt: 2 }}>
+              Pensez à vérifier votre dossier spam si vous ne recevez pas l'email dans les prochaines minutes.
+            </Alert>
+          </DialogContent>
+          <DialogActions sx={{ p: 2 }}>
+            <Button
+              onClick={() => setSuccess(false)}
+              variant="contained"
+              color="secondary"
+              fullWidth
+            >
+              Fermer
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         <Snackbar
           open={!!error}

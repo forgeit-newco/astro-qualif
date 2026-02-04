@@ -21,10 +21,10 @@ export type TicketManager = (typeof TICKET_MANAGERS)[number];
 export const MONITORING_TOOLS = ['Grafana', 'Datadog', 'Open Telemetry'] as const;
 export type MonitoringTool = (typeof MONITORING_TOOLS)[number];
 
-export const MATURITY_LEVELS = ['Industrialisation', 'Expertise', 'Reconciliation', 'Autre/Ne sait pas'] as const;
+export const MATURITY_LEVELS = ['Pas encore à l\'agenda', 'En réflexion / POC prévu', 'On a un Backstage ou une solution maison', 'On cherche à scaler /industrialiser'] as const;
 export type MaturityLevel = (typeof MATURITY_LEVELS)[number];
 
-export const CHALLENGES = ['Onboarding/Delivery', 'Conformite/Scoring', 'FinOps'] as const;
+export const CHALLENGES = ['Productivité & Delivery', 'Onboarding & Rétention', 'Qualité & Conformité', 'Standardisation', 'Visibilité sur les releases', 'Maîtrise des coûts cloud'] as const;
 export type Challenge = (typeof CHALLENGES)[number];
 
 export const PROSPECT_STATUSES = [
@@ -62,7 +62,7 @@ export interface ProspectDiagnostic {
 }
 
 export interface ProspectChallenges {
-  priorities: Challenge[];
+  priorities: string;
 }
 
 export interface ProspectCTA {

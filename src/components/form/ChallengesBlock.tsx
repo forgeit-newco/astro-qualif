@@ -4,22 +4,25 @@ import {
   Typography,
   FormControl,
   FormLabel,
-  FormGroup,
+  RadioGroup,
   FormControlLabel,
-  Checkbox,
+  Radio,
   FormHelperText,
   Paper,
   TextField,
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
-import { CHALLENGES, type ProspectFormData, type Challenge } from '../../types/prospect';
+import { CHALLENGES, type ProspectFormData } from '../../types/prospect';
 
 const OTHER_PREFIX = 'Autre: ';
 
 const CHALLENGE_DESCRIPTIONS: Record<string, string> = {
-  'Onboarding/Delivery': 'Accélérer l\'intégration des nouveaux développeurs et la livraison',
-  'Conformite/Scoring': 'Assurer la conformité, la sécurité, la compliance ou la qualité du code',
-  'FinOps': 'Optimiser et piloter les coûts cloud',
+  'Productivité & Delivery': 'Nos devs passent trop de temps à chercher de l\'info et pas assez à coder',
+  'Onboarding & Rétention': 'Les nouveaux mettent des semaines à être autonomes, et le savoir part avec les seniors',
+  'Qualité & Conformité': 'On n\'a pas de visibilité sur la santé réelle de nos projets (tests, sécu, docs)',
+  'Standardisation': 'Chaque équipe fait à sa façon, impossible d\'imposer des pratiques communes',
+  'Visibilité sur les releases': 'On ne sait jamais ce qui est déployé où, par qui, depuis quand',
+  'Maîtrise des coûts cloud': 'Les budgets infra explosent sans qu\'on sache les imputer',
 };
 
 export function ChallengesBlock() {
@@ -43,12 +46,11 @@ export function ChallengesBlock() {
       <Controller
         name="challenges.priorities"
         control={control}
-        defaultValue={[]}
-        rules={{ validate: (v) => v.length > 0 || 'Sélectionnez au moins un enjeu' }}
+        rules={{ required: 'Sélectionnez un enjeu' }}
         render={({ field }) => (
           <FormControl error={!!errors.challenges?.priorities} fullWidth>
-            <FormLabel>Sélectionnez vos priorités</FormLabel>
-            <FormGroup>
+            <FormLabel>Sélectionnez votre priorité</FormLabel>
+            <RadioGroup {...field}>
               {CHALLENGES.map((challenge) => (
                 <Paper
                   key={challenge}
@@ -57,7 +59,7 @@ export function ChallengesBlock() {
                     p: 2,
                     mb: 1,
                     border: 1,
-                    borderColor: field.value.includes(challenge) ? 'secondary.main' : 'divider',
+                    borderColor: field.value === challenge ? 'secondary.main' : 'divider',
                     borderRadius: 2,
                     cursor: 'pointer',
                     transition: 'all 0.2s',
@@ -67,26 +69,14 @@ export function ChallengesBlock() {
                     },
                   }}
                   onClick={() => {
-                    if (field.value.includes(challenge)) {
-                      field.onChange(field.value.filter((v: Challenge) => v !== challenge));
-                    } else {
-                      field.onChange([...field.value, challenge]);
-                    }
+                    field.onChange(challenge);
+                    setOtherEnabled(false);
+                    setOtherValue('');
                   }}
                 >
                   <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={field.value.includes(challenge)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            field.onChange([...field.value, challenge]);
-                          } else {
-                            field.onChange(field.value.filter((v: Challenge) => v !== challenge));
-                          }
-                        }}
-                      />
-                    }
+                    value={challenge}
+                    control={<Radio />}
                     label={
                       <Box>
                         <Typography variant="subtitle1" fontWeight={500}>
@@ -123,24 +113,21 @@ export function ChallengesBlock() {
                   if ((e.target as HTMLElement).tagName === 'INPUT') {
                     return;
                   }
-                  const newEnabled = !otherEnabled;
-                  setOtherEnabled(newEnabled);
-                  if (!newEnabled) {
-                    field.onChange(field.value.filter((v: string) => !v.startsWith(OTHER_PREFIX)));
-                    setOtherValue('');
+                  setOtherEnabled(true);
+                  if (otherValue.trim()) {
+                    field.onChange(`${OTHER_PREFIX}${otherValue}`);
                   }
                 }}
               >
                 <FormControlLabel
+                  value={field.value?.startsWith(OTHER_PREFIX) ? field.value : ''}
                   control={
-                    <Checkbox
+                    <Radio
                       checked={otherEnabled}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        const checked = e.target.checked;
-                        setOtherEnabled(checked);
-                        if (!checked) {
-                          field.onChange(field.value.filter((v: string) => !v.startsWith(OTHER_PREFIX)));
-                          setOtherValue('');
+                      onChange={() => {
+                        setOtherEnabled(true);
+                        if (otherValue.trim()) {
+                          field.onChange(`${OTHER_PREFIX}${otherValue}`);
                         }
                       }}
                     />
@@ -165,11 +152,8 @@ export function ChallengesBlock() {
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             const newValue = e.target.value;
                             setOtherValue(newValue);
-                            const filtered = field.value.filter((v: string) => !v.startsWith(OTHER_PREFIX));
                             if (newValue.trim()) {
-                              field.onChange([...filtered, `${OTHER_PREFIX}${newValue}`]);
-                            } else {
-                              field.onChange(filtered);
+                              field.onChange(`${OTHER_PREFIX}${newValue}`);
                             }
                           }}
                           sx={{ mt: 1 }}
@@ -180,7 +164,7 @@ export function ChallengesBlock() {
                   sx={{ m: 0, width: '100%', alignItems: 'flex-start' }}
                 />
               </Paper>
-            </FormGroup>
+            </RadioGroup>
             {errors.challenges?.priorities && (
               <FormHelperText>{errors.challenges.priorities.message}</FormHelperText>
             )}

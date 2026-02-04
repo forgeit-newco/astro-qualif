@@ -160,7 +160,7 @@ function formatProspectEmail(prospect) {
   <div class="section">
     <div class="section-title">🎯 Enjeux Prioritaires</div>
     <div class="info-value">
-      ${challenges.priorities.map(p => `<span class="chip">${p}</span>`).join(' ')}
+      <span class="chip">${challenges.priorities}</span>
     </div>
   </div>
 
