@@ -21,31 +21,75 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 // URL du logo Forge IT (hébergé sur CloudFront)
 const LOGO_URL = "https://qualif.forgeit.fr/assets/logo-forgeit.png";
 
+// Maturity levels for next steps
+const MATURITY_LEVELS = [
+  'Pas encore à l\'agenda',
+  'En réflexion / POC prévu',
+  'On a un Backstage ou une solution maison',
+  'On cherche à scaler /industrialiser',
+];
+
 // Default email templates (empty - user will provide content via admin UI)
 const DEFAULT_TEMPLATES = {
   'Productivité & Delivery': {
     constat: '',
     solution: '',
+    nextSteps: {
+      'Pas encore à l\'agenda': '',
+      'En réflexion / POC prévu': '',
+      'On a un Backstage ou une solution maison': '',
+      'On cherche à scaler /industrialiser': '',
+    },
   },
   'Onboarding & Rétention': {
     constat: '',
     solution: '',
+    nextSteps: {
+      'Pas encore à l\'agenda': '',
+      'En réflexion / POC prévu': '',
+      'On a un Backstage ou une solution maison': '',
+      'On cherche à scaler /industrialiser': '',
+    },
   },
   'Qualité & Conformité': {
     constat: '',
     solution: '',
+    nextSteps: {
+      'Pas encore à l\'agenda': '',
+      'En réflexion / POC prévu': '',
+      'On a un Backstage ou une solution maison': '',
+      'On cherche à scaler /industrialiser': '',
+    },
   },
   'Standardisation': {
     constat: '',
     solution: '',
+    nextSteps: {
+      'Pas encore à l\'agenda': '',
+      'En réflexion / POC prévu': '',
+      'On a un Backstage ou une solution maison': '',
+      'On cherche à scaler /industrialiser': '',
+    },
   },
   'Visibilité sur les releases': {
     constat: '',
     solution: '',
+    nextSteps: {
+      'Pas encore à l\'agenda': '',
+      'En réflexion / POC prévu': '',
+      'On a un Backstage ou une solution maison': '',
+      'On cherche à scaler /industrialiser': '',
+    },
   },
   'Maîtrise des coûts cloud': {
     constat: '',
     solution: '',
+    nextSteps: {
+      'Pas encore à l\'agenda': '',
+      'En réflexion / POC prévu': '',
+      'On a un Backstage ou une solution maison': '',
+      'On cherche à scaler /industrialiser': '',
+    },
   },
 };
 
@@ -237,6 +281,27 @@ async function sendProspectNotification(prospect) {
   }
 }
 
+// Format text with HTML escaping, line breaks, and basic markdown
+function formatText(str) {
+  if (!str) return '';
+
+  // 1. HTML escaping
+  let formatted = str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+  // 2. Convert **text** to <strong>text</strong> (markdown bold)
+  formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+  // 3. Convert line breaks to <br>
+  formatted = formatted.replace(/\n/g, '<br>');
+
+  return formatted;
+}
+
 // Generate challenge-specific content for email
 function generateChallengeContent(prospect, templates) {
   if (!prospect.challenges?.priorities || !templates) {
@@ -251,30 +316,37 @@ function generateChallengeContent(prospect, templates) {
   }
 
   const template = templates[challenge];
-  if (!template || (!template.constat && !template.solution)) {
+  if (!template) {
     return '';
   }
 
-  // Simple HTML escaping
-  const escape = (str) => str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+  // Get the appropriate nextSteps based on maturity level
+  const maturityLevel = prospect.diagnostic?.maturityLevel || '';
+  const nextStepsText = template.nextSteps?.[maturityLevel] || '';
+
+  // Check if we have any content to display
+  if (!template.constat && !template.solution && !nextStepsText) {
+    return '';
+  }
 
   return `
     <div class="challenge-section">
       ${template.constat ? `
         <div class="challenge-block-constat">
           <h3>Le constat</h3>
-          <p>${escape(template.constat)}</p>
+          <p>${formatText(template.constat)}</p>
         </div>
       ` : ''}
       ${template.solution ? `
         <div class="challenge-block-solution">
           <h3>Ce qu'Astrolabe apporte</h3>
-          <p>${escape(template.solution)}</p>
+          <p>${formatText(template.solution)}</p>
+        </div>
+      ` : ''}
+      ${nextStepsText ? `
+        <div class="challenge-block-next-steps">
+          <h3>Prochaines étapes</h3>
+          <p>${formatText(nextStepsText)}</p>
         </div>
       ` : ''}
     </div>
@@ -340,6 +412,25 @@ function formatWelcomeEmail(prospect, templates = null) {
       line-height: 1.6;
       color: #333;
     }
+    .challenge-block-next-steps {
+      background-color: #F1F7F7;
+      border-left: 4px solid #67E083;
+      padding: 20px;
+      margin: 30px 0;
+      border-radius: 8px;
+    }
+    .challenge-block-next-steps h3 {
+      color: #29624D;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 0 0 10px 0;
+    }
+    .challenge-block-next-steps p {
+      margin: 0;
+      line-height: 1.6;
+      color: #333;
+      font-size: 15px;
+    }
     .cta-box { background-color: #F1F7F7; border-left: 4px solid #67E083; border-radius: 8px; padding: 20px; margin: 30px 0; }
     .cta-box p { margin: 0; color: #29624D; font-size: 15px; }
     .contact { background-color: #F1F7F7; border-radius: 8px; padding: 20px; margin-top: 30px; text-align: center; }
@@ -364,16 +455,22 @@ function formatWelcomeEmail(prospect, templates = null) {
         Nous vous remercions sincèrement pour votre intérêt envers <span class="highlight">Astrolabe</span>, notre solution de Platform Engineering.
       </div>
 
-      <div class="message">
-        Votre demande a bien été reçue et nous avons pris connaissance de vos besoins. Notre équipe d'experts va étudier votre profil et reviendra vers vous très prochainement pour enclencher la suite de notre collaboration.
-      </div>
+      ${challengeContent ? `
+        <div class="message">
+          Retrouvez ci dessous la solution à votre contexte et vos en-jeux.
+        </div>
 
-      <!-- Personalized challenge content -->
-      ${challengeContent}
+        <!-- Personalized challenge content -->
+        ${challengeContent}
+      ` : `
+        <div class="message">
+          Votre demande a bien été reçue et nous avons pris connaissance de vos besoins. Notre équipe d'experts va étudier votre profil et reviendra vers vous très prochainement pour enclencher la suite de notre collaboration.
+        </div>
 
-      <div class="cta-box">
-        <p>💡 <strong>Prochaines étapes :</strong> Un de nos experts Platform Engineering vous contactera sous peu pour échanger sur votre projet et vos enjeux de maturité DevOps.</p>
-      </div>
+        <div class="cta-box">
+          <p>💡 <strong>Prochaines étapes :</strong> Un de nos experts Platform Engineering vous contactera sous peu pour échanger sur votre projet et vos enjeux de maturité DevOps.</p>
+        </div>
+      `}
 
       <div class="message">
         En attendant, si vous avez des questions ou souhaitez obtenir plus d'informations, n'hésitez pas à nous contacter directement.
@@ -450,6 +547,77 @@ async function sendWelcomeEmail(prospect) {
 
 // === EMAIL TEMPLATE CONFIGURATION ===
 
+// Normalize key to handle apostrophe variations
+function normalizeKey(key) {
+  // Replace different apostrophe characters with standard one
+  return key
+    .replace(/'/g, "'")  // Replace right single quotation mark
+    .replace(/`/g, "'")  // Replace backtick
+    .replace(/'/g, "'"); // Replace left single quotation mark
+}
+
+// Migrate old nextSteps format (string) to new format (object by maturity level)
+function migrateNextStepsFormat(templates) {
+  const migratedTemplates = {};
+
+  for (const [challenge, template] of Object.entries(templates)) {
+    migratedTemplates[challenge] = {
+      constat: template.constat || '',
+      solution: template.solution || '',
+      nextSteps: {},
+    };
+
+    // Check if nextSteps is old format (string) or new format (object)
+    if (typeof template.nextSteps === 'string') {
+      // Old format: migrate by placing the old text in all maturity levels
+      // This preserves the user's data
+      console.log(`[Migration] ${challenge}: Old format (string) detected, migrating to object`);
+      MATURITY_LEVELS.forEach(level => {
+        migratedTemplates[challenge].nextSteps[level] = template.nextSteps;
+      });
+    } else if (typeof template.nextSteps === 'object' && template.nextSteps !== null) {
+      // Already new format - normalize keys and consolidate
+      const normalizedNextSteps = {};
+
+      console.log(`[Migration] ${challenge}: Object format detected. Keys:`, Object.keys(template.nextSteps));
+
+      // First, try to find values for each expected maturity level
+      MATURITY_LEVELS.forEach(expectedLevel => {
+        const normalizedExpected = normalizeKey(expectedLevel);
+        let found = false;
+
+        // Look for matching keys (exact or normalized)
+        for (const [existingKey, value] of Object.entries(template.nextSteps)) {
+          const normalizedExisting = normalizeKey(existingKey);
+          console.log(`[Migration] Comparing "${existingKey}" (normalized: "${normalizedExisting}") with "${expectedLevel}" (normalized: "${normalizedExpected}")`);
+          if (normalizedExisting === normalizedExpected || existingKey === expectedLevel) {
+            normalizedNextSteps[expectedLevel] = value || '';
+            console.log(`[Migration] ✓ Match found for "${expectedLevel}": value length = ${(value || '').length}`);
+            found = true;
+            break;
+          }
+        }
+
+        // If not found, use empty string
+        if (!found) {
+          console.log(`[Migration] ✗ No match found for "${expectedLevel}", using empty string`);
+          normalizedNextSteps[expectedLevel] = '';
+        }
+      });
+
+      migratedTemplates[challenge].nextSteps = normalizedNextSteps;
+    } else {
+      // Missing or invalid: use default empty object
+      console.log(`[Migration] ${challenge}: Invalid or missing nextSteps, using defaults`);
+      MATURITY_LEVELS.forEach(level => {
+        migratedTemplates[challenge].nextSteps[level] = '';
+      });
+    }
+  }
+
+  return migratedTemplates;
+}
+
 // GET /config/email-templates - Get email template configuration
 async function getEmailTemplateConfig() {
   const command = new GetCommand({
@@ -474,18 +642,27 @@ async function getEmailTemplateConfig() {
     };
   }
 
-  return result.Item;
+  // Migrate templates if needed
+  const migratedTemplates = migrateNextStepsFormat(result.Item.templates);
+
+  return {
+    ...result.Item,
+    templates: migratedTemplates,
+  };
 }
 
 // PUT /config/email-templates - Update email template configuration
 async function updateEmailTemplateConfig(data, userEmail) {
   const now = new Date().toISOString();
 
+  // Normalize templates before saving to ensure consistent keys
+  const normalizedTemplates = migrateNextStepsFormat(data.templates);
+
   const config = {
     PK: 'CONFIG#email_templates',
     SK: 'METADATA',
     version: '1.0',
-    templates: data.templates,
+    templates: normalizedTemplates,
     updatedAt: now,
     updatedBy: userEmail || 'unknown',
   };

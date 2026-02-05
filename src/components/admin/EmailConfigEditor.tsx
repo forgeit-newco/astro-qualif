@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { Box, Button, Typography, Alert, CircularProgress, Paper } from '@mui/material';
 import { useForm, FormProvider } from 'react-hook-form';
 import SaveIcon from '@mui/icons-material/Save';
+import EditIcon from '@mui/icons-material/Edit';
 import { useEmailConfig } from '../../hooks/useEmailConfig';
-import { ChallengeTemplateCard } from './ChallengeTemplateCard';
+import { ChallengeEditModal } from './ChallengeEditModal';
 import { CHALLENGES } from '../../types/prospect';
 import type { ChallengeTemplate } from '../../api/emailConfig';
 
@@ -11,6 +12,7 @@ export function EmailConfigEditor() {
   const { config, isLoading, updateConfig, isUpdating } = useEmailConfig();
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedChallenge, setSelectedChallenge] = useState<string | null>(null);
 
   const methods = useForm({
     defaultValues: {
@@ -53,7 +55,7 @@ export function EmailConfigEditor() {
             Configuration des Emails Personnalisés
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-            Définissez le contenu des blocs "Le constat" et "Ce qu'Astrolabe apporte" qui seront
+            Définissez le contenu des blocs "Le constat", "Ce qu'Astrolabe apporte" et "Prochaines étapes" qui seront
             insérés dans l'email de bienvenue en fonction de l'enjeu prioritaire sélectionné par le
             prospect.
           </Typography>
@@ -77,9 +79,49 @@ export function EmailConfigEditor() {
 
         <Box sx={{ mb: 3 }}>
           {CHALLENGES.map((challenge) => (
-            <ChallengeTemplateCard key={challenge} challenge={challenge} />
+            <Paper
+              key={challenge}
+              sx={{
+                p: 2,
+                mb: 2,
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: 2,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                '&:hover': {
+                  borderColor: 'secondary.main',
+                  bgcolor: 'action.hover',
+                },
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  color: 'primary.main',
+                  fontWeight: 600,
+                }}
+              >
+                {challenge}
+              </Typography>
+              <Button
+                variant="outlined"
+                color="secondary"
+                startIcon={<EditIcon />}
+                onClick={() => setSelectedChallenge(challenge)}
+              >
+                Modifier
+              </Button>
+            </Paper>
           ))}
         </Box>
+
+        <ChallengeEditModal
+          challenge={selectedChallenge}
+          open={selectedChallenge !== null}
+          onClose={() => setSelectedChallenge(null)}
+        />
 
         <Paper
           elevation={3}

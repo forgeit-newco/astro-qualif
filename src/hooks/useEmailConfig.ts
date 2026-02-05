@@ -7,6 +7,8 @@ export function useEmailConfig() {
   const { data, isLoading, error } = useQuery<EmailTemplateConfig>({
     queryKey: ['emailConfig'],
     queryFn: emailConfigApi.get,
+    staleTime: 0,
+    gcTime: 0,
   });
 
   const updateMutation = useMutation({

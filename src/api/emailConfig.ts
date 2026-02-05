@@ -3,6 +3,7 @@ import { API_BASE, getHeaders, authenticatedFetch } from '../utils/api';
 export interface ChallengeTemplate {
   constat: string;
   solution: string;
+  nextSteps: Record<string, string>; // Key: maturity level, Value: next steps text
 }
 
 export interface EmailTemplateConfig {

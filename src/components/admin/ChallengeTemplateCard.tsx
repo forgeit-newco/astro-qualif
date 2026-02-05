@@ -15,6 +15,7 @@ export function ChallengeTemplateCard({ challenge }: ChallengeTemplateCardProps)
 
   const constatValue = watch(`templates.${challenge}.constat`) || '';
   const solutionValue = watch(`templates.${challenge}.solution`) || '';
+  const nextStepsValue = watch(`templates.${challenge}.nextSteps`) || '';
 
   return (
     <Paper
@@ -86,6 +87,38 @@ export function ChallengeTemplateCard({ challenge }: ChallengeTemplateCardProps)
                 placeholder="Décrivez la solution apportée par Astrolabe..."
                 helperText={`${solutionValue.length}/${MAX_LENGTH} caractères`}
                 error={solutionValue.length > MAX_LENGTH}
+                inputProps={{ maxLength: MAX_LENGTH }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '&:hover fieldset': {
+                      borderColor: 'secondary.main',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'secondary.main',
+                    },
+                  },
+                }}
+              />
+            </Box>
+          )}
+        />
+
+        {/* Next Steps Field */}
+        <Controller
+          name={`templates.${challenge}.nextSteps`}
+          control={control}
+          defaultValue=""
+          render={({ field }) => (
+            <Box>
+              <TextField
+                {...field}
+                label="Prochaines étapes"
+                multiline
+                rows={4}
+                fullWidth
+                placeholder="Décrivez les prochaines étapes recommandées..."
+                helperText={`${nextStepsValue.length}/${MAX_LENGTH} caractères`}
+                error={nextStepsValue.length > MAX_LENGTH}
                 inputProps={{ maxLength: MAX_LENGTH }}
                 sx={{
                   '& .MuiOutlinedInput-root': {

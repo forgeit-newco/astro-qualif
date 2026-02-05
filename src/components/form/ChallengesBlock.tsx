@@ -17,12 +17,12 @@ import { CHALLENGES, type ProspectFormData } from '../../types/prospect';
 const OTHER_PREFIX = 'Autre: ';
 
 const CHALLENGE_DESCRIPTIONS: Record<string, string> = {
-  'Productivité & Delivery': 'Nos devs passent trop de temps à chercher de l\'info et pas assez à coder',
-  'Onboarding & Rétention': 'Les nouveaux mettent des semaines à être autonomes, et le savoir part avec les seniors',
-  'Qualité & Conformité': 'On n\'a pas de visibilité sur la santé réelle de nos projets (tests, sécu, docs)',
-  'Standardisation': 'Chaque équipe fait à sa façon, impossible d\'imposer des pratiques communes',
-  'Visibilité sur les releases': 'On ne sait jamais ce qui est déployé où, par qui, depuis quand',
-  'Maîtrise des coûts cloud': 'Les budgets infra explosent sans qu\'on sache les imputer',
+  'Productivité & Delivery': 'Nos devs passent trop de temps à chercher de l\'info (Docs, APIs, Owners)',
+  'Onboarding & Rétention': 'La montée en compétences des nouveaux arrivants est longue et perte de connaissance en cas de départ',
+  'Qualité & Conformité': 'On n\'a peu de visibilité sur la santé réelle de nos projets (Sécu, Qualité, Tests)',
+  'Standardisation': 'Chaque équipe fait à sa façon, difficile d\'imposer des pratiques communes',
+  'Visibilité sur les releases': 'Difficultés à tracer ce qui est déployé, par qui, où et depuis quand',
+  'Maîtrise des coûts cloud': 'Nos budgets infra explosent sans visibilité sur l\'imputation des différents projets',
 };
 
 export function ChallengesBlock() {
